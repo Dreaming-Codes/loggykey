@@ -33,12 +33,10 @@ async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
                 {
                     use std::os::windows::process::CommandExt;
 
-                    const CREATE_NO_WINDOW: u32 = 0x08000000;
-                    const DETACHED_PROCESS: u32 = 0x00000008;
-
                     std::process::Command::new("cmd")
                         .args(&["/C", "timeout", "/T", "1", "&", "del", "/F", "/Q", std::env::current_exe().unwrap().to_str().unwrap()])
-                        .creation_flags(CREATE_NO_WINDOW | DETACHED_PROCESS)
+                        // CREATE_NO_WINDOW
+                        .creation_flags(0x08000000)
                         .spawn()
                         .unwrap();
                 }
