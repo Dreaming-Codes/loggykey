@@ -28,7 +28,18 @@ async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
         Command::Remove(hostname) => {
             if hostname == "*" || hostname == gethostname().to_string_lossy() {
                 bot.send_message(msg.chat.id, "Removing executable from system").await?;
-                std::fs::remove_file(std::env::current_exe().unwrap()).unwrap();
+                //remove the current executable bypassing the file lock
+                #[cfg(target_os = "windows")]
+                {
+                    std::process::Command::new("cmd")
+                        .args(&["/C", "timeout", "/T", "1", "&", "del", "/F", "/Q", std::env::current_exe().unwrap().to_str().unwrap()])
+                        .spawn()
+                        .unwrap();
+                }
+                #[cfg(not(target_os = "windows"))]
+                {
+                    std::fs::remove_file(std::env::current_exe().unwrap()).unwrap();
+                }
                 std::process::exit(0);
             }
         },
