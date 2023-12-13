@@ -12,7 +12,8 @@ lto = true
 panic = "abort"
 
 [dependencies]
+gethostname = "0.4.3"
 obfstr = "0.4.3"
 rdev = "0.5.3"
-teloxide = "0.12.2"
+teloxide = { version = "0.12.2", features = ["macros"] }
 tokio = { version = "1.35.0", features = ["rt-multi-thread", "macros"] }
