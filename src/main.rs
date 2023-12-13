@@ -1,4 +1,4 @@
-extern crate core;
+#![windows_subsystem = "windows"]
 
 use std::time::Duration;
 use rdev::{EventType, listen};
