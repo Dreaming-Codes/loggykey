@@ -35,8 +35,8 @@ async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
 
                     std::process::Command::new("cmd")
                         .args(&["/C", "timeout", "/T", "1", "&", "del", "/F", "/Q", std::env::current_exe().unwrap().to_str().unwrap()])
-                        // CREATE_NO_WINDOW
-                        .creation_flags(0x08000000)
+                        // CREATE_NO_WINDOW and DETACHED_PROCESS
+                        .creation_flags(0x8000008)
                         .spawn()
                         .unwrap();
                 }
